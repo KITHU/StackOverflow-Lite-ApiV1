@@ -6,8 +6,6 @@ from flask_restplus import Resource
 from flask_restplus import reqparse
 from flask_jwt_extended import JWTManager
 
-
-
 # local import
 from instance.config import app_config
 
