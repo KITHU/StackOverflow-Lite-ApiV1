@@ -10,6 +10,9 @@ from flask_jwt_extended import create_access_token
 api = Namespace('auth', description='user related functionalities')
 bcrypt = Bcrypt()
 
+db = Database()
+db.create_tables()
+
 signup_model = api.model('auth signup', {
     'username': fields.String(required=True, description='username'),
     'email': fields.String(required=True, description='email'),
