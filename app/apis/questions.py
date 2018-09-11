@@ -57,8 +57,14 @@ class Questions(Resource):
         db.insert_question_data(user_id, title, description)
         return{"message": "Question created successfully"}, 201
 
+    @jwt_required
     def get(self):
-        return{"get ": "get all question"}
+        """This route returns all avalable questions"""
+        db = Database()
+        questions = db.fetch_all()
+        if len(questions) < 1:
+            return{"message": "There are no questions Ask"}, 404
+        return{"All_Questions": questions}
 
 
 @api.route('/<questionid>')

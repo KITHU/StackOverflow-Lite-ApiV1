@@ -96,7 +96,8 @@ class Database:
         for row in rows:
             row = {'question_id': row[0], 'user_id': row[1],
                    'title': row[2],
-                   'description': row[3]
+                   'description': row[3],
+                   'date posted': str(row[4])
                    }
             questions.append(row)
         return questions
