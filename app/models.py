@@ -40,12 +40,12 @@ class Database:
         """
         self.cursor.execute(query)
         
-        query = """ CREATE TABLE IF NOT EXISTS questions (
+       query = """ CREATE TABLE IF NOT EXISTS questions (
         question_id SERIAL,
         user_id INTEGER NOT NULL,
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
-        date TIMESTAMP NOT NULL,
+        date TIMESTAMP DEFAULT now(),
         PRIMARY KEY (question_id),
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         )

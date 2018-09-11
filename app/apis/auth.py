@@ -1,3 +1,4 @@
+"""this module has routes for signup and login"""
 from flask_restplus import Namespace
 from flask_restplus import fields
 from flask_restplus import Resource
@@ -21,7 +22,7 @@ signup_model = api.model('auth signup', {
 login_model = api.model('auth login', {
     'email': fields.String(required=True, description='email'),
     'password': fields.String(required=True, description='password')})
-# signup parser 
+# signup parser
 signup_arg = reqparse.RequestParser()
 signup_arg.add_argument(
             'username',
@@ -38,7 +39,7 @@ signup_arg.add_argument(
             type=str, required=True,
             help="password is required"
             )
-# login parser 
+# login parser
 login_arg = reqparse.RequestParser()
 login_arg.add_argument(
             'email',
@@ -54,8 +55,11 @@ login_arg.add_argument(
 
 @api.route('/signup')
 class Signup(Resource):
-    @api.expect(signup_model)
+    """signup route hosted by this route"""
+    @api.expect(signup_arg)
     def post(self):
+        """user needs username, valid email and
+           password to signup"""
         valid = Validator()
         db = Database()
         user_data = signup_arg.parse_args()
@@ -77,8 +81,11 @@ class Signup(Resource):
 
 @api.route('/login')
 class Login(Resource):
+    """user can login using this route"""
     @api.expect(login_model)
     def post(self):
+        """user needs email used to signup
+        and password to login"""
         valid = Validator()
         db = Database()
         user_data = login_arg.parse_args()
@@ -102,7 +109,6 @@ class Login(Resource):
 
         if(email == user[2] and
            bcrypt.check_password_hash(user[3], password) is True):
-            access_token = create_access_token(identity=email)
+            access_token = create_access_token(identity=user[0])
             return {"message": "login successful",
                     "access_token": access_token}, 200
-
