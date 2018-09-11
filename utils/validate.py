@@ -31,8 +31,8 @@ class Validator():
             return True
         return False
 
-    def q_validate(q):
-        q_pattern = re.compile(r'^[a-zA-Z\s]+')
+    def q_validate(self, q):
+        q_pattern = re.compile(r'^[a-zA-Z0-9]')
         if q_pattern.match(q):
             return True
         return False

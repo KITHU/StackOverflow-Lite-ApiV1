@@ -40,7 +40,7 @@ class Database:
         """
         self.cursor.execute(query)
         
-       query = """ CREATE TABLE IF NOT EXISTS questions (
+        query = """ CREATE TABLE IF NOT EXISTS questions (
         question_id SERIAL,
         user_id INTEGER NOT NULL,
         title VARCHAR(255) NOT NULL,
@@ -81,10 +81,11 @@ class Database:
         result = self.cursor.fetchone()
         return result
     
-    def insert_question_data(self, user_id, title, description, date):
-        """Insert a new question to the database"""
-        query = "INSERT INTO questions (user_id, title, description, date)\
-         VALUES('{}','{}', '{}','{}' );".format(user_id, title, description, date)
+    def insert_answer_data(self, question_id, reply, user_id):
+        """Insert a new answer to a specific question
+        in the database"""
+        query = "INSERT INTO answers (question_id, reply, user_id)\
+         VALUES('{}','{}', '{}' );".format(question_id, reply, user_id)
         self.cursor.execute(query)
         self.connection.commit()
 

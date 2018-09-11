@@ -30,6 +30,17 @@ qst_arg.add_argument(
             help="description is required"
             )
 
+# answer reqparse
+ans_arg = reqparse.RequestParser()
+ans_arg.add_argument(
+            'answer',
+            type=str, required=True,
+            help="answer is required"
+            )
+ans_model = api.model('answer question', {
+    'answer': fields.String(required=True,
+                            description='answer is required')})
+
 
 @api.route('')
 class Questions(Resource):
@@ -88,12 +99,30 @@ class Questionwithid(Resource):
             return{'Warning':
                    'You have no rights to delete this question'}, 403
         return{'message': 'No question by that id'}, 404
-        
 
-@api.route('/<questionid>/answers')
+
+@api.route('/<int:questionid>/answers')
 class QuestionPostAnswer(Resource):
-    def post(self):
-        return{"get": "get a specific question"}
+    """this class has method to provide answers to
+    questions in the database"""
+    @api.expect(ans_model)
+    @jwt_required
+    def post(self, questionid):
+        """method to post a question answer
+        anybody can post an answer to a question"""
+        valid = Validator()
+        db = Database()
+        user_id = get_jwt_identity()
+        ans_input = ans_arg.parse_args()
+        user_answer = ans_input['answer']
+        if valid.q_validate(user_answer) is False:
+            return{"message": "answer must contain leters"}, 400
+        if db.get_by_argument("questions", "question_id", questionid):
+            if db.get_by_argument('answers', 'reply', user_answer):
+                return {'message': 'That answer already exists'}, 409
+            db.insert_answer_data(questionid, user_answer, user_id)
+            return{"message": "Your answer was posted successfully"}, 201
+        return{"message": "question id does not exist"}, 404
 
 
 @api.route('/<questionid>/answers/<answerid>')
