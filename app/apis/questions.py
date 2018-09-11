@@ -67,14 +67,28 @@ class Questions(Resource):
         return{"All_Questions": questions}
 
 
-@api.route('/<questionid>')
+@api.route('/<int:questionid>')
 class Questionwithid(Resource):
-    def get(self):
-        return{"get": "get a specific question"}
+    """this class has routes for get a question
+    by id and delete a question """
+    def get(self, questionid):
+        return{"get": questionid}
 
-    def delete(self):
-        return{"delete": "delete a specific question with all answers"}
-
+    @jwt_required
+    def delete(self, questionid):
+        """this routes delete a question and all answers provided"""
+        db = Database()
+        user_id = get_jwt_identity()
+        questions = db.get_by_argument('questions', 'question_id', questionid)
+        if questions:
+            if user_id in questions:
+                db.delete_question(questionid)
+                return{'message':
+                       'Question deleted successfully and answers'}, 200
+            return{'Warning':
+                   'You have no rights to delete this question'}, 403
+        return{'message': 'No question by that id'}, 404
+        
 
 @api.route('/<questionid>/answers')
 class QuestionPostAnswer(Resource):

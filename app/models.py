@@ -119,12 +119,10 @@ class Database:
 
     def delete_question(self, question_id):
         """method deletes question from database"""
-        delete_answers = "DELETE FROM answers WHERE question_id = {}".format(
-            question_id)
-        self.cursor.execute(delete_answers)
         delete_query = "DELETE FROM questions WHERE question_id = {}" .format(
             question_id)
         self.cursor.execute(delete_query)
+        self.connection.commit()
 
     def drop_tables(self):
         """method drops all tables in database"""
