@@ -111,10 +111,10 @@ class Database:
         items = self.cursor.fetchall()
         return items
 
-    def insert_answer_data(self, question_id, reply, user_id):
+    def insert_question_data(self, user_id, title, description):
         """Insert a new question to the database"""
-        query = "INSERT INTO answers (question_id, reply, user_id)\
-         VALUES('{}','{}', '{}' );".format(question_id, reply, user_id)
+        query = "INSERT INTO questions (user_id, title, description)\
+         VALUES('{}','{}', '{}' );".format(user_id, title, description)
         self.cursor.execute(query)
         self.connection.commit()
 
