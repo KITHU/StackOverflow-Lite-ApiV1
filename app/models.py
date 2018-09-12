@@ -59,6 +59,8 @@ class Database:
         user_id INTEGER NOT NULL,
         reply TEXT NOT NULL,
         preffered VARCHAR(30) DEFAULT 'False',
+        up_vote INTEGER DEFAULT 0,
+        down_vote INTEGER DEFAULT 0,
         PRIMARY KEY (answer_id),
         FOREIGN KEY (question_id) REFERENCES \
         questions(question_id) ON DELETE CASCADE,
