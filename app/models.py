@@ -45,7 +45,7 @@ class Database:
         user_id INTEGER NOT NULL,
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
-        date TIMESTAMP NOT NULL,
+        date TIMESTAMP DEFAULT now(),
         PRIMARY KEY (question_id),
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
@@ -59,6 +59,8 @@ class Database:
         user_id INTEGER NOT NULL,
         reply TEXT NOT NULL,
         preffered VARCHAR(30) DEFAULT 'False',
+        up_vote INTEGER DEFAULT 0,
+        down_vote INTEGER DEFAULT 0,
         PRIMARY KEY (answer_id),
         FOREIGN KEY (question_id) REFERENCES \
         questions(question_id) ON DELETE CASCADE,
@@ -81,10 +83,11 @@ class Database:
         result = self.cursor.fetchone()
         return result
     
-    def insert_question_data(self, user_id, title, description, date):
-        """Insert a new question to the database"""
-        query = "INSERT INTO questions (user_id, title, description, date)\
-         VALUES('{}','{}', '{}','{}' );".format(user_id, title, description, date)
+    def insert_answer_data(self, question_id, reply, user_id):
+        """Insert a new answer to a specific question
+        in the database"""
+        query = "INSERT INTO answers (question_id, reply, user_id)\
+         VALUES('{}','{}', '{}' );".format(question_id, reply, user_id)
         self.cursor.execute(query)
         self.connection.commit()
 
@@ -96,7 +99,8 @@ class Database:
         for row in rows:
             row = {'question_id': row[0], 'user_id': row[1],
                    'title': row[2],
-                   'description': row[3]
+                   'description': row[3],
+                   'date posted': str(row[4])
                    }
             questions.append(row)
         return questions
@@ -109,21 +113,19 @@ class Database:
         items = self.cursor.fetchall()
         return items
 
-    def insert_answer_data(self, question_id, reply, user_id):
+    def insert_question_data(self, user_id, title, description):
         """Insert a new question to the database"""
-        query = "INSERT INTO answers (question_id, reply, user_id)\
-         VALUES('{}','{}', '{}' );".format(question_id, reply, user_id)
+        query = "INSERT INTO questions (user_id, title, description)\
+         VALUES('{}','{}', '{}' );".format(user_id, title, description)
         self.cursor.execute(query)
         self.connection.commit()
 
     def delete_question(self, question_id):
         """method deletes question from database"""
-        delete_answers = "DELETE FROM answers WHERE question_id = {}".format(
-            question_id)
-        self.cursor.execute(delete_answers)
         delete_query = "DELETE FROM questions WHERE question_id = {}" .format(
             question_id)
         self.cursor.execute(delete_query)
+        self.connection.commit()
 
     def drop_tables(self):
         """method drops all tables in database"""

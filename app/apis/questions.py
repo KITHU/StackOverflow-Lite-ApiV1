@@ -1,29 +1,152 @@
+"""This module holds question related operations
+it has post a question, get all questions
+delete a question"""
 from flask_restplus import Namespace
 from flask_restplus import Resource
+from flask_restplus import reqparse
+from flask_restplus import fields
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity
+from app.models import Database
+from utils.validate import Validator
 
 api = Namespace('questions', description='question related functionalities')
+
+qst_model = api.model('ask question', {
+    'title': fields.String(required=True,
+                           description='title is required'),
+    'description': fields.String(required=True,
+                                 description='description is required')})
+
+qst_arg = reqparse.RequestParser()
+qst_arg.add_argument(
+            'title',
+            type=str, required=True,
+            help="title is required"
+            )
+qst_arg.add_argument(
+            'description',
+            type=str, required=True,
+            help="description is required"
+            )
+
+# answer reqparse
+ans_arg = reqparse.RequestParser()
+ans_arg.add_argument(
+            'answer',
+            type=str, required=True,
+            help="answer is required"
+            )
+ans_model = api.model('answer question', {
+    'answer': fields.String(required=True,
+                            description='answer is required')})
 
 
 @api.route('')
 class Questions(Resource):
+    """this class deals with posting a question and
+     get all questions. it has two routes"""
+    @api.expect(qst_model)
+    @jwt_required
     def post(self):
-        return{"post a question": "post a question"}
+        """This routes post a new question if it does not exist"""
+        valid = Validator()
+        db = Database()
+        qst_input = qst_arg.parse_args()
+        title = qst_input['title']
+        description = qst_input['description']
+        if valid.q_validate(title) is False:
+            return{"error": "title is invalid"}, 400
+        if valid.q_validate(description) is False:
+            return{"error": "description is invalid"}, 400
+        if db.get_by_argument('questions', 'description', description):
+            return {'message': 'question already exists'}, 409
+        if db.get_by_argument('questions', 'title', title):
+            return {'message': 'question already exists'}, 409
 
+        user_id = get_jwt_identity()
+        db.insert_question_data(user_id, title, description)
+        return{"message": "Question created successfully"}, 201
+
+    @jwt_required
     def get(self):
-        return{"get ": "get all question"}
+        """This route returns all avalable questions"""
+        db = Database()
+        questions = db.fetch_all()
+        if len(questions) < 1:
+            return{"message": "There are no questions Ask"}, 404
+        return{"All_Questions": questions}
 
-@api.route('/<questionid>')
+
+@api.route('/<int:questionid>')
 class Questionwithid(Resource):
-    def get(self):
-        return{"get": "get a specific question"}
+    """this class has routes for get a question
+    by id and delete a question """
+    @jwt_required
+    def get(self, questionid):
+        """route to get a single question by id and
+        all the available answers"""
+        db = Database()
+        questions = db.get_by_argument('questions', 'question_id', questionid)
+        if questions:
+            question = {"question_id": questions[0],
+                        "title": questions[2],
+                        "description": questions[3],
+                        "date posted": str(questions[4])}
+            answers = db.query_all_where_id('answers', 'question_id', questionid)
 
-    def delete(self):
-        return{"delete": "delete a specific question with all answers"}
+            answerlist = []
+            for ans in answers:
+                answerdic = {"answer_id": ans[0],
+                             "question_id": ans[1],
+                             "user_id": ans[2],
+                             "answer": ans[3],
+                             "preffered": ans[4]
+                             }
+                answerlist.append(answerdic)
+            return{"question": question,
+                   "answers": answerlist}, 200
+        return{"message": "no question by that id"}, 400
 
-@api.route('/<questionid>/answers')
+    @jwt_required
+    def delete(self, questionid):
+        """this routes delete a question and all answers provided"""
+        db = Database()
+        user_id = get_jwt_identity()
+        questions = db.get_by_argument('questions', 'question_id', questionid)
+        if questions:
+            if user_id in questions:
+                db.delete_question(questionid)
+                return{'message':
+                       'Question deleted successfully and answers'}, 200
+            return{'Warning':
+                   'You have no rights to delete this question'}, 403
+        return{'message': 'No question by that id'}, 404
+
+
+@api.route('/<int:questionid>/answers')
 class QuestionPostAnswer(Resource):
-    def post(self):
-        return{"get": "get a specific question"}
+    """this class has method to provide answers to
+    questions in the database"""
+    @api.expect(ans_model)
+    @jwt_required
+    def post(self, questionid):
+        """method to post a question answer
+        anybody can post an answer to a question"""
+        valid = Validator()
+        db = Database()
+        user_id = get_jwt_identity()
+        ans_input = ans_arg.parse_args()
+        user_answer = ans_input['answer']
+        if valid.q_validate(user_answer) is False:
+            return{"message": "answer must contain leters"}, 400
+        if db.get_by_argument("questions", "question_id", questionid):
+            if db.get_by_argument('answers', 'reply', user_answer):
+                return {'message': 'That answer already exists'}, 409
+            db.insert_answer_data(questionid, user_answer, user_id)
+            return{"message": "Your answer was posted successfully"}, 201
+        return{"message": "question id does not exist"}, 404
+
 
 @api.route('/<questionid>/answers/<answerid>')
 class QuestionAnswerAccept(Resource):
