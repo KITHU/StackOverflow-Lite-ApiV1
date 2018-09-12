@@ -41,6 +41,19 @@ ans_model = api.model('answer question', {
     'answer': fields.String(required=True,
                             description='answer is required')})
 
+# modify answer reqpase
+modify_arg = reqparse.RequestParser()
+modify_arg.add_argument(
+            'answer',
+            type=str, required=False,
+            help="modify answer"
+            )
+modify_arg.add_argument(
+            'preffered',
+            type=str, required=False,
+            help="preffered set to True"
+            )  
+
 
 @api.route('')
 class Questions(Resource):
@@ -150,5 +163,31 @@ class QuestionPostAnswer(Resource):
 
 @api.route('/<questionid>/answers/<answerid>')
 class QuestionAnswerAccept(Resource):
-    def put(self):
-        return{"get": "get a specific question"}
+    @api.expect(modify_arg)
+    @jwt_required
+    def put(self, questionid, answerid):
+        db = Database()
+        valid = Validator()
+        user_id = get_jwt_identity()
+        answer = db.get_by_argument("answers", "question_id", questionid)
+        if answer:
+            if user_id in answer:
+                preffered = modify_arg.parse_args()
+                preffer = preffered['preffered']
+                if preffer != "True":
+                    return{"message": "preffered has no value True"}, 400
+                db.update_answer_record("answers", "preffered", preffer,
+                                        "answer_id", answerid)
+                return{"message": "answer marked as preffered"}, 200
+            
+            answer1 = db.get_by_argument("answers", "answer_id", answerid)
+            if answer1:
+                if user_id in answer1:
+                    modifyans = modify_arg.parse_args()
+                    eddited_ans = modifyans["answer"]
+                    if valid.q_validate(eddited_ans) is False:
+                        return{"message": "answer should contain letters"}
+                    db.update_answer_record("answers", "reply", eddited_ans,
+                                            "answer_id", answerid)
+                    return{"message": "answer updated sucessfully"}, 200
+        return{"message": "warning you are not authorized"}, 403
