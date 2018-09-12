@@ -82,8 +82,31 @@ class Questions(Resource):
 class Questionwithid(Resource):
     """this class has routes for get a question
     by id and delete a question """
+    @jwt_required
     def get(self, questionid):
-        return{"get": questionid}
+        """route to get a single question by id and
+        all the available answers"""
+        db = Database()
+        questions = db.get_by_argument('questions', 'question_id', questionid)
+        if questions:
+            question = {"question_id": questions[0],
+                        "title": questions[2],
+                        "description": questions[3],
+                        "date posted": str(questions[4])}
+            answers = db.query_all_where_id('answers', 'question_id', questionid)
+
+            answerlist = []
+            for ans in answers:
+                answerdic = {"answer_id": ans[0],
+                             "question_id": ans[1],
+                             "user_id": ans[2],
+                             "answer": ans[3],
+                             "preffered": ans[4]
+                             }
+                answerlist.append(answerdic)
+            return{"question": question,
+                   "answers": answerlist}, 200
+        return{"message": "no question by that id"}, 400
 
     @jwt_required
     def delete(self, questionid):
