@@ -1,6 +1,7 @@
 """test module that test methods in the Model class
 and also the api routes in the qustions.py"""
 import unittest
+from flask import json
 from app.models import Database
 from app import create_app
 
@@ -135,4 +136,3 @@ class TestModels(unittest.TestCase):
                                 content_type='application/json',
                                 data=json.dumps(self.answer1))
         self.assertEqual(res8.status_code, 409)
-        
