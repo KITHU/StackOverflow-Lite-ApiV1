@@ -1,7 +1,7 @@
 # StackOverflow-Lite-ApiV1
 
 [![Build Status](https://travis-ci.org/KITHU/StackOverflow-Lite-ApiV1.svg?branch=develop)](https://travis-ci.org/KITHU/StackOverflow-Lite-ApiV1)
-[![Coverage Status](https://coveralls.io/repos/github/KITHU/StackOverflow-Lite-ApiV1/badge.svg?branch=ft-questions-endpoints-160411066)](https://coveralls.io/github/KITHU/StackOverflow-Lite-ApiV1?branch=ft-questions-endpoints-160411066)
+[![Coverage Status](https://coveralls.io/repos/github/KITHU/StackOverflow-Lite-ApiV1/badge.svg)](https://coveralls.io/github/KITHU/StackOverflow-Lite-ApiV1)
 [![Maintainability](https://api.codeclimate.com/v1/badges/73317bbf8502c9e9b20a/maintainability)](https://codeclimate.com/github/KITHU/StackOverflow-Lite-ApiV1/maintainability)
 
 
