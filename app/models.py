@@ -127,11 +127,22 @@ class Database:
         self.cursor.execute(delete_query)
         self.connection.commit()
 
+    def update_answer_record(self,
+                             table_name, set_column,
+                             new_value, where_column, item_id):
+        """method updates record. i.e UPDATE table_name SET set_column =
+         new_value, wherewhere_colum = item_id"""
+        updt = "Update {} SET {} = '{}' WHERE {} = '{}'".format(table_name,
+                                                                set_column,
+                                                                new_value,
+                                                                where_column,
+                                                                item_id)
+        self.cursor.execute(updt)
+        self.connection.commit()
+
     def drop_tables(self):
         """method drops all tables in database"""
         self.cursor.execute("""DROP TABLE IF EXISTS users CASCADE""")
         self.cursor.execute("""DROP TABLE IF EXISTS questions CASCADE""")
         self.cursor.execute("""DROP TABLE IF EXISTS answers CASCADE""")
         self.connection.commit()
-
-
