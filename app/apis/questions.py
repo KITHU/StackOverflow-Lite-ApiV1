@@ -106,7 +106,8 @@ class Questionwithid(Resource):
                         "title": questions[2],
                         "description": questions[3],
                         "date posted": str(questions[4])}
-            answers = db.query_all_where_id('answers', 'question_id', questionid)
+            answers = db.query_all_where_id('answers',
+                                            'question_id', questionid)
 
             answerlist = []
             for ans in answers:
@@ -114,7 +115,9 @@ class Questionwithid(Resource):
                              "question_id": ans[1],
                              "user_id": ans[2],
                              "answer": ans[3],
-                             "preffered": ans[4]
+                             "preffered": ans[4],
+                             "up_vote": ans[5],
+                             "down_vote": ans[6]
                              }
                 answerlist.append(answerdic)
             return{"question": question,
@@ -171,7 +174,7 @@ class QuestionAnswerAccept(Resource):
         user_id = get_jwt_identity()
         answer = db.get_by_argument("answers", "question_id", questionid)
         if answer:
-            if user_id in answer:
+            if user_id == answer[2]:
                 preffered = modify_arg.parse_args()
                 preffer = preffered['preffered']
                 if preffer != "True":
@@ -182,7 +185,7 @@ class QuestionAnswerAccept(Resource):
             
             answer1 = db.get_by_argument("answers", "answer_id", answerid)
             if answer1:
-                if user_id in answer1:
+                if user_id == answer1[2]:
                     modifyans = modify_arg.parse_args()
                     eddited_ans = modifyans["answer"]
                     if valid.q_validate(eddited_ans) is False:
@@ -191,3 +194,48 @@ class QuestionAnswerAccept(Resource):
                                             "answer_id", answerid)
                     return{"message": "answer updated sucessfully"}, 200
         return{"message": "warning you are not authorized"}, 403
+
+    @api.route("/userquestions")
+    class AllUserQuestions(Resource):
+        """will fetch all questions a user have posted"""
+        @jwt_required
+        def get(self):
+            """all questions by the current user"""
+            db = Database()
+            user_id = get_jwt_identity()
+            questions = db.query_all_where_id("questions", "user_id", user_id)
+            if questions:
+                user_qst = []
+                for qst in questions:
+                    question = {"question_id": qst[0], "user_id": qst[1],
+                                "title": qst[2], "description": qst[3],
+                                "date": str(qst[4])}
+                user_qst.append(question)
+                return{"total_questions": len(user_qst),
+                       "questions": question}, 200
+            return{"total_questions": 0}, 200
+
+    @api.route("/useranswers")
+    class AllUserAnswers(Resource):
+        """will fetch all questions a user have posted"""
+        @jwt_required
+        def get(self):
+            """all answers by the current user"""
+            db = Database()
+            user_id = get_jwt_identity()
+            answers = db.query_all_where_id("answers", "user_id", user_id)
+            if answers:
+                ans_list = []
+                for ans in answers:
+                    answerdic = {"answer_id": ans[0],
+                                 "question_id": ans[1],
+                                 "user_id": ans[2],
+                                 "answer": ans[3],
+                                 "preffered": ans[4],
+                                 "up_vote": ans[5],
+                                 "down_vote": ans[6]
+                                 }
+                    ans_list.append(answerdic)
+                return{"total_answers": len(ans_list),
+                       "user_answers": ans_list}, 200
+            return{"total_answers": 0}, 200
