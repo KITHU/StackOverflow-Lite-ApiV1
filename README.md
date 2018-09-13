@@ -35,9 +35,14 @@ POST api/auth/signup               | Register new user
 POST api/auth/login                | Login user
 GET  api/v1/questions              | returns all questions
 GET  api/v1/questions/id           | returns a single question and all available answers
+GET  api/v1/questions/userquestions| fetches all the questions by current user and the count
+GET api/v1/questions/useransers    | fetches all answers by the current user
 POST api/v1/questions              | post a question to app
-POST api/v1/questions/id/answers   | post an answer to a question 
+POST api/v1/questions/id/answers   | post an answer to a question
+PUT api/v1/questions/qid/answerid  | modifies an answer or marks answer as preffered 
 DETELE api/v1/questions/id         | delete a question and all the available answers
+POST api/v1/votes/ansid/upvote     | up votes an answer
+POST api/v1/votes/ansid/downvote   | down votes an answer
 
 ## local setup and testing using postman
 1. create a python3 virtual environment 
