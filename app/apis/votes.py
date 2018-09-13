@@ -16,7 +16,7 @@ class Downvote(Resource):
     def post(self, answerid):
         """this route will downvote an answer"""
         db = Database()
-        votes = db.get_by_argument("answers", "answer_id",)
+        votes = db.get_by_argument("answers", "answer_id", answerid)
         if votes:
             downvote = votes[6] + 1
             db.update_answer_record("answers", "down_vote",
@@ -30,10 +30,10 @@ class Downvote(Resource):
     """this class deals with logic to up vote
      an answer"""
     @jwt_required
-    def post(self):
+    def post(self, answerid):
         """this route will upvote an answer"""
         db = Database()
-        votes = db.get_by_argument("answers", "answer_id",)
+        votes = db.get_by_argument("answers", "answer_id", answerid)
         if votes:
             upvote = votes[5] + 1
             db.update_answer_record("answers", "up_vote",
