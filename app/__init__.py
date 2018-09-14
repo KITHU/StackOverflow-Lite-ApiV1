@@ -1,3 +1,5 @@
+"""module to create app using factory
+method.."""
 from flask import Flask
 from flask_restplus import Api, namespace
 from flask_restplus import model
@@ -12,11 +14,11 @@ from instance.config import app_config
 
 
 def create_app(config_name):
+    """method to initialize app"""
     app = Flask(__name__)
     app.config.from_object(app_config[config_name])
-    jwt = JWTManager(app)
+    JWTManager(app)
     CORS(app)
-    jwt._set_error_handler_callbacks(app)
     from app.apis import apiv1_bp
     app.register_blueprint(apiv1_bp, url_prefix='/api/v1')
     return app

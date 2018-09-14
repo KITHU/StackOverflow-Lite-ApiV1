@@ -26,7 +26,7 @@ class Downvote(Resource):
 
 
 @api.route('/<answerid>/upvote')
-class Downvote(Resource):
+class Upvote(Resource):
     """this class deals with logic to up vote
      an answer"""
     @jwt_required

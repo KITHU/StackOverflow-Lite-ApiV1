@@ -3,16 +3,13 @@ from flask_restplus import Namespace
 from flask_restplus import fields
 from flask_restplus import Resource
 from flask_restplus import reqparse
-from app.models import Database
-from utils.validate import Validator
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token
+from utils.validate import Validator
+from app.models import Database
 
 api = Namespace('auth', description='user related functionalities')
 bcrypt = Bcrypt()
-
-db = Database()
-db.create_tables()
 
 signup_model = api.model('auth signup', {
     'username': fields.String(required=True, description='username'),
@@ -25,32 +22,33 @@ login_model = api.model('auth login', {
 # signup parser
 signup_arg = reqparse.RequestParser()
 signup_arg.add_argument(
-            'username',
-            type=str, required=True,
-            help='usernae is required!'
-            )
+                        'username',
+                        type=str,
+                        required=True,
+                        help='usernae is required!'
+                        )
 signup_arg.add_argument(
-            'email',
-            type=str, required=True,
-            help="email is required"
-            )
+                        'email',
+                        type=str, required=True,
+                        help="email is required"
+                        )
 signup_arg.add_argument(
-            'password',
-            type=str, required=True,
-            help="password is required"
-            )
+                        'password',
+                        type=str, required=True,
+                        help="password is required"
+                        )
 # login parser
 login_arg = reqparse.RequestParser()
 login_arg.add_argument(
-            'email',
-            type=str, required=True,
-            help="email is required"
-            )
+                       'email',
+                       type=str, required=True,
+                       help="email is required"
+                       )
 login_arg.add_argument(
-            'password',
-            type=str, required=True,
-            help="password is required"
-            )
+                       'password',
+                       type=str, required=True,
+                       help="password is required"
+                       )
 
 
 @api.route('/signup')
