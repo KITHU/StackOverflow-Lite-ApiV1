@@ -213,9 +213,9 @@ class QuestionAnswerAccept(Resource):
                     question = {"question_id": qst[0], "user_id": qst[1],
                                 "title": qst[2], "description": qst[3],
                                 "date": str(qst[4])}
-                user_qst.append(question)
+                    user_qst.append(question)
                 return{"total_questions": len(user_qst),
-                       "questions": question}, 200
+                       "questions": user_qst}, 200
             return{"total_questions": 0}, 200
 
     @api.route("/useranswers")
