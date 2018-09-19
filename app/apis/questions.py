@@ -20,23 +20,23 @@ qst_model = api.model('ask question', {
 
 qst_arg = reqparse.RequestParser()
 qst_arg.add_argument(
-            'title',
-            type=str, required=True,
-            help="title is required"
-            )
+        'title',
+        type=str, required=True,
+        help="title is required"
+                     )
 qst_arg.add_argument(
-            'description',
-            type=str, required=True,
-            help="description is required"
-            )
+                     'description',
+                     type=str, required=True,
+                     help="description is required"
+                     )
 
 # answer reqparse
 ans_arg = reqparse.RequestParser()
 ans_arg.add_argument(
-            'answer',
-            type=str, required=True,
-            help="answer is required"
-            )
+                     'answer',
+                     type=str, required=True,
+                     help="answer is required"
+                     )
 ans_model = api.model('answer question', {
     'answer': fields.String(required=True,
                             description='answer is required')})
@@ -44,15 +44,15 @@ ans_model = api.model('answer question', {
 # modify answer reqpase
 modify_arg = reqparse.RequestParser()
 modify_arg.add_argument(
-            'answer',
-            type=str, required=False,
-            help="modify answer"
-            )
+                        'answer',
+                        type=str, required=False,
+                        help="modify answer"
+                        )
 modify_arg.add_argument(
-            'preffered',
-            type=str, required=False,
-            help="preffered set to True"
-            )  
+                        'preffered',
+                        type=str, required=False,
+                        help="preffered set to True"
+                        )
 
 
 @api.route('')
@@ -166,9 +166,12 @@ class QuestionPostAnswer(Resource):
 
 @api.route('/<questionid>/answers/<answerid>')
 class QuestionAnswerAccept(Resource):
+    """class to host method to modify answer if current user
+    is the owner or mark answer accepted"""
     @api.expect(modify_arg)
     @jwt_required
     def put(self, questionid, answerid):
+        """modify answer or mark it as preffered"""
         db = Database()
         valid = Validator()
         user_id = get_jwt_identity()
@@ -182,7 +185,7 @@ class QuestionAnswerAccept(Resource):
                 db.update_answer_record("answers", "preffered", preffer,
                                         "answer_id", answerid)
                 return{"message": "answer marked as preffered"}, 200
-            
+
             answer1 = db.get_by_argument("answers", "answer_id", answerid)
             if answer1:
                 if user_id == answer1[2]:

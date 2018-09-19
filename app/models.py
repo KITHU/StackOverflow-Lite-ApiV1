@@ -39,7 +39,7 @@ class Database:
         )
         """
         self.cursor.execute(query)
-        
+
         query = """ CREATE TABLE IF NOT EXISTS questions (
         question_id SERIAL,
         user_id INTEGER NOT NULL,
@@ -69,7 +69,7 @@ class Database:
         """
         self.cursor.execute(query)
         self.connection.commit()
-       
+
     def insert_user_data(self, username, email, password):
         """insert new user data to database i.e create user"""
         user_query = "INSERT INTO users (username, email, password) VALUES\
@@ -78,11 +78,14 @@ class Database:
         self.connection.commit()
 
     def get_by_argument(self, table, column_name, argument):
-        query = "SELECT * FROM {} WHERE {} = '{}';".format(table, column_name, argument)
+        """universal method to query database by one field"""
+        query = "SELECT * FROM {} WHERE {} = '{}';".format(table,
+                                                           column_name,
+                                                           argument)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         return result
-    
+
     def insert_answer_data(self, question_id, reply, user_id):
         """Insert a new answer to a specific question
         in the database"""

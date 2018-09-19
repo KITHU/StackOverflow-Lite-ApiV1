@@ -1,3 +1,5 @@
+"""module for initializing namespaces
+has three namespaces auth,questions and votes"""
 from flask import Blueprint
 from flask_restplus import Api
 from .auth import api as ns1
