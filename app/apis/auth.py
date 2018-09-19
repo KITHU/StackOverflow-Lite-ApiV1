@@ -107,6 +107,7 @@ class Login(Resource):
 
         if(email == user[2] and
            bcrypt.check_password_hash(user[3], password) is True):
-            access_token = create_access_token(identity=user[0])
+            access_token = create_access_token(identity=user[0],
+            expires_delta=False)
             return {"message": "login successful",
                     "access_token": access_token}, 200
