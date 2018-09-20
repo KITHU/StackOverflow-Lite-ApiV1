@@ -110,4 +110,6 @@ class Login(Resource):
             access_token = create_access_token(identity=user[0],
             expires_delta=False)
             return {"message": "login successful",
+                    "username": user[1],
+                    "userid": user[0],
                     "access_token": access_token}, 200
